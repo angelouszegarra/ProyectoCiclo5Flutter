@@ -1,3 +1,5 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/producto.dart';
@@ -18,17 +20,14 @@ class ProductoDatabase {
   }
 
 Future<Database> _initDatabase() async {
-  print('Iniciando _initDatabase'); // <-- Añade esto
   String path = join(await getDatabasesPath(), 'regadora_app.db');
   return await openDatabase(
     path,
     version: 1,
     onCreate: _onCreate,
   ).then((db) {
-    print('Base de datos abierta correctamente'); // <-- Añade esto
     return db;
   }).catchError((e) {
-    print('Error al abrir la base de datos: $e'); // <-- Añade esto
     throw e;
   });
 }
@@ -41,7 +40,6 @@ Future<Database> _initDatabase() async {
 
   Future<void> _onCreate(Database db, int version) async {
     // Tabla de productos
-    print('Creando tablas en la base de datos'); // <-- Añade esto
     await db.execute('''
       CREATE TABLE productos(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -84,7 +82,6 @@ Future<Database> _initDatabase() async {
 
   Future<void> _insertInitialData(Database db) async {
     // Planes de regadoras
-    print('Insertando datos iniciales'); // <-- Añade esto
     await db.insert('productos', {
       'nombre': 'Plan Básico',
       'descripcion': 'Regadora automática para jardín pequeño',
@@ -180,7 +177,6 @@ Future<Database> _initDatabase() async {
       'subcategoria': 'verduras',
       'imagen': 'assets/images/zanahoria.png',
     });
-    print('Tablas creadas correctamente'); // <-- Añade esto
   }
 
   Future<List<Producto>> getProductosPorCategoria(String categoria) async {
@@ -190,7 +186,6 @@ Future<Database> _initDatabase() async {
       where: 'categoria = ?',
       whereArgs: [categoria],
     );
-    print('Resultados de la consulta: $maps'); // <-- Añade esto
     return List.generate(maps.length, (i) => Producto.fromMap(maps[i]));
   }
   

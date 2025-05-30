@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
+import '../widgets/base_scaffold.dart';
 
 class InfoPage extends StatelessWidget {
   const InfoPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Información'),
-        backgroundColor: const Color(0xFF4CAF50),
-        foregroundColor: Colors.white,
-      ),
+    return BaseScaffold(
+      title: 'Información',
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(

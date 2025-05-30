@@ -17,7 +17,7 @@ import 'package:laboratorio_10/screens/home_page.dart';
 void main() {
   testWidgets('HomePage smoke test', (WidgetTester tester) async {
     // Construye la app con HomePage
-    await tester.pumpWidget(MaterialApp(home: HomePage(usuario: Usuario(nombre: '', email: '', password: ''),)));
+    await tester.pumpWidget(MaterialApp(home: HomePage()));
 
     // Verifica que el título principal esté presente
     expect(find.text('AquaGarden'), findsOneWidget);

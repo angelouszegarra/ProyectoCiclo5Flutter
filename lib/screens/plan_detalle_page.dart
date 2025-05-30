@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/producto.dart';
+import '../widgets/base_scaffold.dart';
 
 class PlanDetallePage extends StatelessWidget {
   final Producto plan;
@@ -8,12 +9,8 @@ class PlanDetallePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(plan.nombre),
-        backgroundColor: const Color(0xFF4CAF50),
-        foregroundColor: Colors.white,
-      ),
+    return BaseScaffold(
+      title: plan.nombre,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -24,7 +21,8 @@ class PlanDetallePage extends StatelessWidget {
                 plan.imagen,
                 width: 200,
                 height: 200,
-                errorBuilder: (context, error, stackTrace) => const Icon(Icons.image, size: 100),
+                errorBuilder: (context, error, stackTrace) =>
+                    const Icon(Icons.image, size: 100),
               ),
             ),
             const SizedBox(height: 24),
@@ -73,9 +71,8 @@ class PlanDetallePage extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {
-                  // Agregar al carrito y pedir más info si es necesario
+                  // Aquí puedes agregar lógica para agregar al carrito o pedir más info
                   Navigator.pop(context);
-                  // Aquí puedes agregar lógica para pedir más info o ir al carrito
                 },
                 child: const Text(
                   'Seleccionar Plan',

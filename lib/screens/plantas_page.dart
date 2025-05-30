@@ -2,8 +2,11 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../db/producto_database.dart';
 import '../models/producto.dart';
+import '../providers/app_state.dart';
+import '../widgets/base_scaffold.dart';
 
 class PlantasPage extends StatefulWidget {
   const PlantasPage({super.key});
@@ -25,7 +28,6 @@ class _PlantasPageState extends State<PlantasPage> {
     'Verduras',
   ];
 
-  // Mapa para relacionar los nombres de los filtros con las subcategorías de la base de datos
   final Map<String, String> filtroMap = {
     'Plantas internas': 'interior',
     'Árboles': 'árboles',
@@ -51,10 +53,8 @@ class _PlantasPageState extends State<PlantasPage> {
     });
   }
 
-
   List<Producto> _filtrarPlantas() {
     if (filtroSeleccionado == 'General') return plantas;
-    // Usa el mapa para obtener la subcategoría correcta
     final subcat = filtroMap[filtroSeleccionado] ?? filtroSeleccionado.toLowerCase();
     return plantas
         .where((p) => p.subcategoria.toLowerCase().contains(subcat))
@@ -63,18 +63,8 @@ class _PlantasPageState extends State<PlantasPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Plantas y Semillas'),
-        backgroundColor: const Color(0xFF4CAF50),
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.shopping_cart),
-            onPressed: () => Navigator.pushNamed(context, '/carrito'),
-          ),
-        ],
-      ),
+    return BaseScaffold(
+      title: 'Plantas y Semillas',
       body: Column(
         children: [
           // Barra de filtros
@@ -168,10 +158,10 @@ class _PlantasPageState extends State<PlantasPage> {
                                       IconButton(
                                         icon: const Icon(Icons.add_shopping_cart),
                                         color: const Color(0xFF4CAF50),
-                                        onPressed: () async {
-                                          final db = ProductoDatabase();
-                                          await db.agregarAlCarrito(planta.id!, 1);
-                                          if (!mounted) return;
+                                        onPressed: () {
+                                          // Usar AppState para agregar al carrito
+                                          final appState = Provider.of<AppState>(context, listen: false);
+                                          appState.agregarAlCarrito(planta);
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(
                                             SnackBar(

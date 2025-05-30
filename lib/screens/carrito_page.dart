@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../db/producto_database.dart';
+import 'package:provider/provider.dart';
 import '../models/producto.dart';
+import '../providers/app_state.dart';
 
 class CarritoPage extends StatefulWidget {
   const CarritoPage({super.key});
@@ -10,42 +11,30 @@ class CarritoPage extends StatefulWidget {
 }
 
 class _CarritoPageState extends State<CarritoPage> {
-  List<Producto> carrito = [];
-  double total = 0;
-  bool isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _cargarCarrito();
-  }
-
-  Future<void> _cargarCarrito() async {
-    final db = ProductoDatabase();
-    final carritoCargado = await db.getCarrito();
-    setState(() {
-      carrito = carritoCargado;
-      total = carrito.fold(0, (sum, p) => sum + (p.precio * p.cantidad));
-      isLoading = false;
-    });
-  }
-
-  Future<void> _eliminarDelCarrito(int productoId) async {
-    final db = ProductoDatabase();
-    await db.eliminarDelCarrito(productoId);
-    await _cargarCarrito();
-  }
-
   @override
   Widget build(BuildContext context) {
+    final appState = Provider.of<AppState>(context);
+    final List<Producto> carrito = appState.carrito;
+    final double total = carrito.fold(0, (sum, p) => sum + (p.precio * p.cantidad));
+
+    Future<void> eliminarDelCarrito(int productoId) async {
+      final nuevosProductos = carrito.where((producto) => producto.id != productoId).toList();
+      appState.setCarrito(nuevosProductos);
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Carrito de Compras'),
         backgroundColor: const Color(0xFF4CAF50),
         foregroundColor: Colors.white,
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+      body: carrito.isEmpty
+          ? const Center(
+              child: Text(
+                'El carrito está vacío',
+                style: TextStyle(fontSize: 18),
+              ),
+            )
           : Column(
               children: [
                 Expanded(
@@ -68,7 +57,7 @@ class _CarritoPageState extends State<CarritoPage> {
                         trailing: IconButton(
                           icon: const Icon(Icons.delete, color: Colors.red),
                           onPressed: () async {
-                            await _eliminarDelCarrito(item.id!);
+                            await eliminarDelCarrito(item.id!);
                           },
                         ),
                       );
@@ -101,27 +90,6 @@ class _CarritoPageState extends State<CarritoPage> {
                         ),
                       ),
                     ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF4CAF50),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      onPressed: () =>
-                          Navigator.pushNamed(context, '/registro'),
-                      child: const Text(
-                        'Continuar con la Instalación',
-                        style: TextStyle(fontSize: 18, color: Colors.white),
-                      ),
-                    ),
                   ),
                 ),
               ],

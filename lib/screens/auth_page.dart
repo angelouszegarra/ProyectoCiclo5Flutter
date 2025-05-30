@@ -1,8 +1,9 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
-import 'package:laboratorio_10/screens/home_page.dart';
+import 'package:provider/provider.dart';
 import '../models/usuario.dart';
+import '../providers/app_state.dart';
 
 enum AuthMode { login, register }
 
@@ -25,6 +26,39 @@ class _AuthPageState extends State<AuthPage> {
     _nombreController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  void _submit() {
+    // Validar campos
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor completa todos los campos')),
+      );
+      return;
+    }
+    if (authMode == AuthMode.register && _nombreController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor ingresa tu nombre')),
+      );
+      return;
+    }
+
+    // Crear usuario (simulado, luego lo guardas en la base de datos)
+    final usuario = Usuario(
+      id: 1, // Esto lo asignas con el ID real de la base de datos
+      nombre: authMode == AuthMode.register
+          ? _nombreController.text
+          : 'Usuario', // Si es login, puedes poner un nombre genérico o pedirlo después
+      email: _emailController.text,
+      password: _passwordController.text,
+      avatar: null,
+    );
+
+    // Guardar usuario en AppState
+    Provider.of<AppState>(context, listen: false).setUsuario(usuario);
+
+    // Navegar a HomePage sin pasar usuario por parámetro
+    Navigator.pushReplacementNamed(context, '/home');
   }
 
   @override
@@ -93,40 +127,7 @@ class _AuthPageState extends State<AuthPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                onPressed: () {
-                  // Validar campos
-                  if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Por favor completa todos los campos')),
-                    );
-                    return;
-                  }
-                  if (authMode == AuthMode.register && _nombreController.text.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Por favor ingresa tu nombre')),
-                    );
-                    return;
-                  }
-
-                  // Crear usuario (simulado, luego lo guardas en la base de datos)
-                  final usuario = Usuario(
-                    id: 1, // Esto lo asignas con el ID real de la base de datos
-                    nombre: authMode == AuthMode.register
-                        ? _nombreController.text
-                        : 'Usuario', // Si es login, puedes poner un nombre genérico o pedirlo después
-                    email: _emailController.text,
-                    password: _passwordController.text,
-                    avatar: null,
-                  );
-
-                  // Navegar a MainPage con el usuario
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => HomePage(usuario: usuario),
-                    ),
-                  );
-                },
+                onPressed: _submit,
                 child: Text(
                   authMode == AuthMode.login ? 'Iniciar Sesión' : 'Registrarse',
                   style: const TextStyle(

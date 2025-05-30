@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/base_scaffold.dart';
 
 class IntegrantesPage extends StatelessWidget {
   const IntegrantesPage({super.key});
@@ -32,12 +33,8 @@ class IntegrantesPage extends StatelessWidget {
       },
     ];
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Integrantes'),
-        backgroundColor: const Color(0xFF4CAF50),
-        foregroundColor: Colors.white,
-      ),
+    return BaseScaffold(
+      title: 'Integrantes',
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: integrantes.length,
@@ -52,7 +49,8 @@ class IntegrantesPage extends StatelessWidget {
                   CircleAvatar(
                     radius: 50,
                     backgroundImage: AssetImage(integrante['imagen']!),
-                    onBackgroundImageError: (_, __) => const Icon(Icons.person, size: 50),
+                    onBackgroundImageError: (_, __) =>
+                        const Icon(Icons.person, size: 50),
                   ),
                   const SizedBox(height: 16),
                   Text(

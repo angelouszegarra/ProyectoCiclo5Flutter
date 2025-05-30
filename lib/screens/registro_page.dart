@@ -106,18 +106,6 @@ class _RegistroPageState extends State<RegistroPage> {
                           ? _telefonoController.text
                           : null,
                     );
-
-                    // Limpiar carrito
-                    await db.limpiarCarrito();
-
-                    if (!mounted) return;
-                    
-                    Navigator.pushReplacementNamed(context, '/');
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('¡Instalación programada con éxito!'),
-                      ),
-                    );
                   }
                 },
                 child: const Text(

@@ -1,7 +1,12 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../db/producto_database.dart';
 import '../models/producto.dart';
-import './plan_detalle_page.dart'; // Asegúrate de que este archivo existe
+import '../providers/app_state.dart';
+import '../widgets/base_scaffold.dart'; // Asegúrate de crear este widget como te expliqué
+import './plan_detalle_page.dart';
 
 class PlanesPage extends StatefulWidget {
   const PlanesPage({super.key});
@@ -21,20 +26,15 @@ class _PlanesPageState extends State<PlanesPage> {
   }
 
   Future<void> _cargarPlanes() async {
-    print('Iniciando carga de planes'); // <-- Añade esto
     final db = ProductoDatabase();
     final planesCargados = await db.getProductosPorCategoria('plan');
-    print('Planes cargados: $planesCargados'); // <-- Ya lo tienes
     setState(() {
       planes = planesCargados;
       isLoading = false;
     });
   }
 
-
-
   Future<void> _mostrarDetallesPlan(BuildContext context, Producto plan) async {
-    // Navega a la pantalla de detalles del plan
     final resultado = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -42,15 +42,14 @@ class _PlanesPageState extends State<PlanesPage> {
       ),
     );
 
-    // Si el usuario seleccionó el plan desde la pantalla de detalles,
-    // procede a agregarlo al carrito y mostrar el cuadro de opciones
     if (resultado == true) {
-      final db = ProductoDatabase();
-      await db.agregarAlCarrito(plan.id!, 1);
+      final appState = Provider.of<AppState>(context, listen: false);
+
+      // Agregar al carrito usando AppState
+      appState.agregarAlCarrito(plan);
 
       if (!mounted) return;
 
-      // Snackbar arriba a la derecha
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('${plan.nombre} agregado al carrito'),
@@ -63,7 +62,6 @@ class _PlanesPageState extends State<PlanesPage> {
         ),
       );
 
-      // Diálogo para elegir: agregar plantas o ir al carrito
       await showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -93,12 +91,8 @@ class _PlanesPageState extends State<PlanesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Nuestros Planes'),
-        backgroundColor: const Color(0xFF4CAF50),
-        foregroundColor: Colors.white,
-      ),
+    return BaseScaffold(
+      title: 'Nuestros Planes',
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : Padding(
